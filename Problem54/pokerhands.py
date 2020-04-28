@@ -10,14 +10,18 @@ class Card(namedtuple('Card', 'face, suit')):
 suit = 'H D C S'.split()
 #create list of card faces
 #one has to have ace as low value for finding straights
-faces = '2 3 4 5 6 7 8 9 10 J Q K A'
-lowaces = 'A 2 3 4 5 6 7 8 9 10 J Q K'
+faces = '2 3 4 5 6 7 8 9 T J Q K A'
+lowaces = 'A 2 3 4 5 6 7 8 9 T J Q K'
 face = faces.split()
 lowace = lowaces.split()
 
 def makeHand(cards='AH AD AC AS KS'):
-    hand = []
-    return hand
+    for card in cards.split():
+        f, s = card[:-1], card[-1]
+        assert f in face, f"Error: card face '{f}' does not exist"
+        assert s in suit, f"Error: card suit '{s}' does not exist"
+        print(f)
+        print(s)
 
 
 #gives full file path to poker hands file
@@ -37,6 +41,7 @@ if __name__ == "__main__":
             player_one_str = ''.join(player_one)
             player_two_str = ''.join(player_two)
 
-            print(player_one_str)
-            print(player_two_str)
+            #creates hand of the 'card' class
+            makeHand(player_one_str)
+
             break
