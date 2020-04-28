@@ -16,7 +16,7 @@ face = faces.split()
 lowace = lowaces.split()
 
 #creates hand from string and returns a list of "card" objects
-def makeHand(cards='AH AD AC AS KS'):
+def makeHand(cards='2C 3S 8S 8D TD'):
     hand = []
     for card in cards.split():
         f, s = card[:-1], card[-1]
@@ -27,15 +27,26 @@ def makeHand(cards='AH AD AC AS KS'):
     assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
     return hand
 
+#checks if hand is a "onepair" rank
+def onepair(hand):
+    allfaces = [f for f, s in hand]
+    allftypes = set(allfaces)
+    pairs = [f for f in allftypes if allfaces.count(f) == 2]
+    if len(pairs) != 1:
+        return False
+    allftypes.remove(pairs[0])
+    return 'onepair', pairs + sorted(allftypes, key=lambda f: face.index(f), reverse=True)
+
 #checks if hand is a "high card" rank
 def highcard(hand):
     allfaces = [f for f, s in hand]
+    #returns the rank and the cards sorted by value in case of a needed tie breaker
     return 'highcard', sorted(allfaces, key=lambda f: face.index(f), reverse=True)
 
 #gives full file path to poker hands file
 script_path = os.path.dirname(__file__)
 filename = os.path.join(script_path, "hands.txt")
-#script starting point
+
 if __name__ == "__main__":
     #open the file
     with open(filename, "r") as f:
@@ -52,5 +63,7 @@ if __name__ == "__main__":
             #creates hand of the 'card' class
             print(makeHand(player_one_str))
             print(makeHand(player_two_str))
+
+            print(onepair(makeHand()))
 
             break
