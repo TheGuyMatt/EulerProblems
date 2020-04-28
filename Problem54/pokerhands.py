@@ -15,6 +15,7 @@ lowaces = 'A 2 3 4 5 6 7 8 9 T J Q K'
 face = faces.split()
 lowace = lowaces.split()
 
+#creates hand from string and returns a list of "card" objects
 def makeHand(cards='AH AD AC AS KS'):
     hand = []
     for card in cards.split():
@@ -25,6 +26,11 @@ def makeHand(cards='AH AD AC AS KS'):
     assert len(hand) == 5, f"Error: Hand must be 5 cards not {len(hand)}"
     assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
     return hand
+
+#checks if hand is a "high card" rank
+def highcard(hand):
+    allfaces = [f for f, s in hand]
+    return 'highcard', sorted(allfaces, key=lambda f: face.index(f), reverse=True)
 
 #gives full file path to poker hands file
 script_path = os.path.dirname(__file__)
