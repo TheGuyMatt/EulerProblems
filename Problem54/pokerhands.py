@@ -15,6 +15,11 @@ lowaces = 'A 2 3 4 5 6 7 8 9 10 J Q K'
 face = faces.split()
 lowace = lowaces.split()
 
+def makeHand(cards='AH AD AC AS KS'):
+    hand = []
+    return hand
+
+
 #gives full file path to poker hands file
 script_path = os.path.dirname(__file__)
 filename = os.path.join(script_path, "hands.txt")
@@ -26,8 +31,12 @@ if __name__ == "__main__":
         for line in f:
             #separate cards into lists representing each "player"
             cards = line.split()
-            player_one = [cards[0], cards[1], cards[2], cards[3], cards[4]]
-            player_two = [cards[5], cards[6], cards[7], cards[8], cards[9]]
+            player_one = [cards[0] + ' ', cards[1] + ' ', cards[2] + ' ', cards[3] + ' ', cards[4]]
+            player_two = [cards[5] + ' ', cards[6] + ' ', cards[7] + ' ', cards[8] + ' ', cards[9]]
+            #create string variables for the functions to parse
+            player_one_str = ''.join(player_one)
+            player_two_str = ''.join(player_two)
 
-            print(player_one[0])
+            print(player_one_str)
+            print(player_two_str)
             break
