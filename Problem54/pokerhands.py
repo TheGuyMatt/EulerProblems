@@ -16,7 +16,7 @@ face = faces.split()
 lowace = lowaces.split()
 
 #creates hand from string and returns a list of "card" objects
-def makeHand(cards='8C 8D JH JD JC'):
+def makeHand(cards='TC JS JH JD JC'):
     hand = []
     for card in cards.split():
         f, s = card[:-1], card[-1]
@@ -26,6 +26,19 @@ def makeHand(cards='8C 8D JH JD JC'):
     assert len(hand) == 5, f"Error: Hand must be 5 cards not {len(hand)}"
     assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
     return hand
+
+#checks if hand is a "fourofakind" rank
+def fourofakind(hand):
+    allfaces = [f for f, s in hand]
+    allftypes = set(allfaces)
+    if len(allftypes) != 2:
+        return False
+    for f in allftypes:
+        if allfaces.count(f) == 4:
+            allftypes.remove(f)
+            return 'fourofakind', [f, allftypes.pop()]
+    else:
+        return False
 
 #checks if hand is a "fullhouse" rank
 def fullhouse(hand):
@@ -118,6 +131,6 @@ if __name__ == "__main__":
             print(makeHand(player_one_str))
             print(makeHand(player_two_str))
 
-            print(fullhouse(makeHand()))
+            print(fourofakind(makeHand()))
 
             break
