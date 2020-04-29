@@ -21,7 +21,7 @@ def straightflush(hand):
     ordered = sorted(hand, key=lambda card: (f.index(card.face), card.suit))
     first, rest = ordered[0], ordered[1:]
     if (all(card.suit == first.suit for card in rest) and ' '.join(card.face for card in ordered) in fs):
-        return 'straightflush', ordered[-1].face
+        return 8, ordered[-1].face
     return False
 
 #checks if hand is a "fourofakind" rank
@@ -33,7 +33,7 @@ def fourofakind(hand):
     for f in allftypes:
         if allfaces.count(f) == 4:
             allftypes.remove(f)
-            return 'fourofakind', [f, allftypes.pop()]
+            return 7, [f, allftypes.pop()]
     else:
         return False
 
@@ -46,7 +46,7 @@ def fullhouse(hand):
     for f in allftypes:
         if allfaces.count(f) == 3:
             allftypes.remove(f)
-            return 'fullhouse', [f, allftypes.pop()]
+            return 6, [f, allftypes.pop()]
     else:
         return False
 
@@ -55,7 +55,7 @@ def flush(hand):
     allstypes = {s for f, s in hand}
     if len(allstypes) == 1:
         allfaces = [f for f, s in hand]
-        return 'flush', sorted(allfaces, key=lambda f: face.index(f), reverse=True)
+        return 5, sorted(allfaces, key=lambda f: face.index(f), reverse=True)
     else:
         return False
 
@@ -64,7 +64,7 @@ def straight(hand):
     f, fs = ( (lowace, lowaces) if any(card.face == '2' for card in hand) else (face, faces))
     ordered = sorted(hand, key=lambda card: (f.index(card.face), card.suit))
     if ' '.join(card.face for card in ordered) in fs:
-        return 'straight', ordered[-1].face
+        return 4, ordered[-1].face
     return False
 
 #checks if hand is a "threeofakind" rank
@@ -76,7 +76,7 @@ def threeofakind(hand):
     for f in allftypes:
         if allfaces.count(f) == 3:
             allftypes.remove(f)
-            return 'threeofakind', [f] + sorted(allftypes, key=lambda f: face.index(f), reverse=True)
+            return 3, [f] + sorted(allftypes, key=lambda f: face.index(f), reverse=True)
     else:
         return False
 
@@ -89,7 +89,7 @@ def twopair(hand):
         return False
     p0, p1 = pairs
     other = [(allftypes - set(pairs)).pop()]
-    return 'twopair', pairs + other if face.index(p0) > face.index(p1) else pairs[::-1] + other
+    return 2, pairs + other if face.index(p0) > face.index(p1) else pairs[::-1] + other
 
 #checks if hand is a "onepair" rank
 def onepair(hand):
@@ -99,13 +99,13 @@ def onepair(hand):
     if len(pairs) != 1:
         return False
     allftypes.remove(pairs[0])
-    return 'onepair', pairs + sorted(allftypes, key=lambda f: face.index(f), reverse=True)
+    return 1, pairs + sorted(allftypes, key=lambda f: face.index(f), reverse=True)
 
 #checks if hand is a "high card" rank
 def highcard(hand):
     allfaces = [f for f, s in hand]
     #returns the rank and the cards sorted by value in case of a needed tie breaker
-    return 'highcard', sorted(allfaces, key=lambda f: face.index(f), reverse=True)
+    return 0, sorted(allfaces, key=lambda f: face.index(f), reverse=True)
 
 #creates hand from string and returns a list of "card" objects
 def makeHand(cards='7C 8C 9C TC JC'):
@@ -132,9 +132,30 @@ def rank(cards):
     assert rank, f'Error: Can not rank cards: {cards}'
     return rank
 
+#decides the winner given two players hands
+#returns true for player one, false for player two
+def decidewinner(one_player, two_player):
+    ponerank = rank(one_player)
+    ptworank = rank(two_player)
+    if ponerank[0] > ptworank[0]: return True
+    elif ponerank[0] < ptworank[0]: return False
+    elif ponerank[0] == ptworank[0]:
+        if ponerank[0] == 4 or ponerank[0] == 8:
+            if face.index(ponerank[1]) > face.index(ptworank[1]): return True
+            elif face.index(ponerank[1]) < face.index(ptworank[1]): return False
+
+        for i in range(len(ponerank[1])):
+            if face.index(ponerank[1][i]) > face.index(ptworank[1][i]): return True
+            elif face.index(ponerank[1][i]) < face.index(ptworank[1][i]): return False
+
+        raise ValueError('Error: winner could not be decided')
+    else: raise ValueError('Error: winner could not be decided')
+
 #gives full file path to poker hands file
 script_path = os.path.dirname(__file__)
 filename = os.path.join(script_path, "hands.txt")
+
+playeronewins = 0
 
 if __name__ == "__main__":
     #open the file
@@ -149,10 +170,9 @@ if __name__ == "__main__":
             player_one_str = ''.join(player_one)
             player_two_str = ''.join(player_two)
 
-            #creates hand of the 'card' class
-            print(makeHand(player_one_str))
-            print(makeHand(player_two_str))
-
-            print(rank(player_two_str))
-
-            break
+            if (decidewinner(player_one_str, player_two_str)):
+                playeronewins += 1
+                print('player one wins')
+            else:
+                print('player two wins')
+    print(playeronewins)
