@@ -16,7 +16,7 @@ face = faces.split()
 lowace = lowaces.split()
 
 #creates hand from string and returns a list of "card" objects
-def makeHand(cards='TC JS JH JD JC'):
+def makeHand(cards='7C 8C 9C TC JC'):
     hand = []
     for card in cards.split():
         f, s = card[:-1], card[-1]
@@ -26,6 +26,15 @@ def makeHand(cards='TC JS JH JD JC'):
     assert len(hand) == 5, f"Error: Hand must be 5 cards not {len(hand)}"
     assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
     return hand
+
+#checks if hand is a "straightflush" rank
+def straightflush(hand):
+    f, fs = ((lowace, lowaces) if any(card.face == '2' for card in hand) else (face, faces))
+    ordered = sorted(hand, key=lambda card: (f.index(card.face), card.suit))
+    first, rest = ordered[0], ordered[1:]
+    if (all(card.suit == first.suit for card in rest) and ' '.join(card.face for card in ordered) in fs):
+        return 'straightflush', ordered[-1].face
+    return False
 
 #checks if hand is a "fourofakind" rank
 def fourofakind(hand):
@@ -131,6 +140,6 @@ if __name__ == "__main__":
             print(makeHand(player_one_str))
             print(makeHand(player_two_str))
 
-            print(fourofakind(makeHand()))
+            print(straightflush(makeHand()))
 
             break
