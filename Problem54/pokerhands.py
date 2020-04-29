@@ -15,18 +15,6 @@ lowaces = 'A 2 3 4 5 6 7 8 9 T J Q K'
 face = faces.split()
 lowace = lowaces.split()
 
-#creates hand from string and returns a list of "card" objects
-def makeHand(cards='7C 8C 9C TC JC'):
-    hand = []
-    for card in cards.split():
-        f, s = card[:-1], card[-1]
-        assert f in face, f"Error: card face '{f}' does not exist"
-        assert s in suit, f"Error: card suit '{s}' does not exist"
-        hand.append(Card(f, s))
-    assert len(hand) == 5, f"Error: Hand must be 5 cards not {len(hand)}"
-    assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
-    return hand
-
 #checks if hand is a "straightflush" rank
 def straightflush(hand):
     f, fs = ((lowace, lowaces) if any(card.face == '2' for card in hand) else (face, faces))
@@ -119,6 +107,31 @@ def highcard(hand):
     #returns the rank and the cards sorted by value in case of a needed tie breaker
     return 'highcard', sorted(allfaces, key=lambda f: face.index(f), reverse=True)
 
+#creates hand from string and returns a list of "card" objects
+def makeHand(cards='7C 8C 9C TC JC'):
+    hand = []
+    for card in cards.split():
+        f, s = card[:-1], card[-1]
+        assert f in face, f"Error: card face '{f}' does not exist"
+        assert s in suit, f"Error: card suit '{s}' does not exist"
+        hand.append(Card(f, s))
+    assert len(hand) == 5, f"Error: Hand must be 5 cards not {len(hand)}"
+    assert len(set(hand)) == 5, f"Error: Hand must have all unique cards {cards}"
+    return hand
+
+#determines the rank of each kind of hand
+rankorder = (straightflush, fourofakind, fullhouse, flush, straight, threeofakind, twopair, onepair, highcard)
+
+#function that determines hand rank
+def rank(cards):
+    hand = makeHand(cards)
+    for ranker in rankorder:
+        rank = ranker(hand)
+        if rank:
+            break
+    assert rank, f'Error: Can not rank cards: {cards}'
+    return rank
+
 #gives full file path to poker hands file
 script_path = os.path.dirname(__file__)
 filename = os.path.join(script_path, "hands.txt")
@@ -140,6 +153,6 @@ if __name__ == "__main__":
             print(makeHand(player_one_str))
             print(makeHand(player_two_str))
 
-            print(straightflush(makeHand()))
+            print(rank(player_two_str))
 
             break
